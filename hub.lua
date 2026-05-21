@@ -4,189 +4,229 @@ local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
-local mouse = player:GetMouse()
 
--- GUI Configuration
+-- SETTINGS
+local aimbotEnabled = false
+local aimbotRange = 100
+local smoothness = 0.12
+
+-- GUI
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "AimbotGui"
+screenGui.Name = "AimbotGUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Main Frame
+-- MAIN FRAME
 local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 250, 0, 200)
-mainFrame.Position = UDim2.new(0.5, -125, 0, 20)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.Size = UDim2.new(0, 260, 0, 220)
+mainFrame.Position = UDim2.new(0.5, -130, 0.5, -110)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
 mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true -- MOBILE + PC DRAG
 mainFrame.Parent = screenGui
 
--- Add corner radius
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
+corner.CornerRadius = UDim.new(0,10)
 corner.Parent = mainFrame
 
--- Title
+-- TITLE
 local title = Instance.new("TextLabel")
-title.Name = "Title"
-title.Size = UDim2.new(1, 0, 0, 40)
-title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 16
+title.Size = UDim2.new(1,0,0,40)
+title.BackgroundColor3 = Color3.fromRGB(35,35,35)
+title.Text = "Mobile Aim Assist"
+title.TextColor3 = Color3.new(1,1,1)
 title.Font = Enum.Font.GothamBold
-title.Text = "Aim Assist System"
+title.TextSize = 18
 title.BorderSizePixel = 0
 title.Parent = mainFrame
 
 local titleCorner = Instance.new("UICorner")
-titleCorner.CornerRadius = UDim.new(0, 8)
+titleCorner.CornerRadius = UDim.new(0,10)
 titleCorner.Parent = title
 
--- Toggle Button for Aimbot
+-- TOGGLE BUTTON
 local toggleButton = Instance.new("TextButton")
-toggleButton.Name = "ToggleButton"
-toggleButton.Size = UDim2.new(0.9, 0, 0, 40)
-toggleButton.Position = UDim2.new(0.05, 0, 0, 50)
-toggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleButton.TextSize = 14
-toggleButton.Font = Enum.Font.Gotham
-toggleButton.Text = "Aimbot: OFF"
+toggleButton.Size = UDim2.new(0.9,0,0,45)
+toggleButton.Position = UDim2.new(0.05,0,0,55)
+toggleButton.BackgroundColor3 = Color3.fromRGB(180,50,50)
+toggleButton.Text = "Aimbot OFF"
+toggleButton.TextColor3 = Color3.new(1,1,1)
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.TextSize = 16
 toggleButton.BorderSizePixel = 0
 toggleButton.Parent = mainFrame
 
-local buttonCorner = Instance.new("UICorner")
-buttonCorner.CornerRadius = UDim.new(0, 6)
-buttonCorner.Parent = toggleButton
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0,8)
+toggleCorner.Parent = toggleButton
 
--- Range Slider
+-- RANGE LABEL
 local rangeLabel = Instance.new("TextLabel")
-rangeLabel.Name = "RangeLabel"
-rangeLabel.Size = UDim2.new(1, 0, 0, 25)
-rangeLabel.Position = UDim2.new(0, 0, 0, 95)
+rangeLabel.Size = UDim2.new(1,0,0,25)
+rangeLabel.Position = UDim2.new(0,0,0,115)
 rangeLabel.BackgroundTransparency = 1
-rangeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-rangeLabel.TextSize = 12
+rangeLabel.Text = "Range: 100"
+rangeLabel.TextColor3 = Color3.new(1,1,1)
 rangeLabel.Font = Enum.Font.Gotham
-rangeLabel.Text = "Range: 100 studs"
+rangeLabel.TextSize = 14
 rangeLabel.Parent = mainFrame
 
-local rangeSlider = Instance.new("Frame")
-rangeSlider.Name = "RangeSlider"
-rangeSlider.Size = UDim2.new(0.9, 0, 0, 10)
-rangeSlider.Position = UDim2.new(0.05, 0, 0, 125)
-rangeSlider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-rangeSlider.BorderSizePixel = 0
-rangeSlider.Parent = mainFrame
+-- SLIDER BAR
+local sliderBack = Instance.new("Frame")
+sliderBack.Size = UDim2.new(0.9,0,0,14)
+sliderBack.Position = UDim2.new(0.05,0,0,145)
+sliderBack.BackgroundColor3 = Color3.fromRGB(50,50,50)
+sliderBack.BorderSizePixel = 0
+sliderBack.Parent = mainFrame
 
-local sliderCorner = Instance.new("UICorner")
-sliderCorner.CornerRadius = UDim2.new(0, 5)
-sliderCorner.Parent = rangeSlider
+local sliderBackCorner = Instance.new("UICorner")
+sliderBackCorner.CornerRadius = UDim.new(1,0)
+sliderBackCorner.Parent = sliderBack
 
+-- SLIDER FILL
 local sliderFill = Instance.new("Frame")
-sliderFill.Name = "Fill"
-sliderFill.Size = UDim2.new(0.5, 0, 1, 0)
-sliderFill.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+sliderFill.Size = UDim2.new(0.45,0,1,0)
+sliderFill.BackgroundColor3 = Color3.fromRGB(0,170,255)
 sliderFill.BorderSizePixel = 0
-sliderFill.Parent = rangeSlider
+sliderFill.Parent = sliderBack
 
-local fillCorner = Instance.new("UICorner")
-fillCorner.CornerRadius = UDim2.new(0, 5)
-fillCorner.Parent = sliderFill
+local sliderFillCorner = Instance.new("UICorner")
+sliderFillCorner.CornerRadius = UDim.new(1,0)
+sliderFillCorner.Parent = sliderFill
 
--- Settings
-local aimbotEnabled = false
-local aimbotRange = 100
-local smoothness = 0.1
-local targetPlayer = nil
+-- CLOSE BUTTON
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0,35,0,35)
+closeButton.Position = UDim2.new(1,-40,0,5)
+closeButton.BackgroundColor3 = Color3.fromRGB(200,60,60)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.new(1,1,1)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 16
+closeButton.BorderSizePixel = 0
+closeButton.Parent = mainFrame
 
--- Toggle Aimbot
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(1,0)
+closeCorner.Parent = closeButton
+
+-- TOGGLE
 toggleButton.MouseButton1Click:Connect(function()
 	aimbotEnabled = not aimbotEnabled
-	if aimbotEnabled then
-		toggleButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
-		toggleButton.Text = "Aimbot: ON"
-	else
-		toggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-		toggleButton.Text = "Aimbot: OFF"
-		targetPlayer = nil
-	end
-end)
-
--- Slider Interaction (for mobile and desktop)
-rangeSlider.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		local function updateSlider()
-			local mousePos = mouse.X
-			local sliderPos = rangeSlider.AbsolutePosition.X
-			local sliderSize = rangeSlider.AbsoluteSize.X
-			local percentage = math.clamp((mousePos - sliderPos) / sliderSize, 0, 1)
-			
-			aimbotRange = math.floor(percentage * 200) + 10
-			sliderFill.Size = UDim2.new(percentage, 0, 1, 0)
-			rangeLabel.Text = "Range: " .. aimbotRange .. " studs"
-		end
-		
-		updateSlider()
-		local connection
-		connection = RunService.RenderStepped:Connect(function()
-			if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) or UserInputService:IsTouchActive(1) then
-				updateSlider()
-			else
-				connection:Disconnect()
-			end
-		end)
-	end
-end)
-
--- Find closest enemy
-local function findClosestEnemy()
-	local closestDistance = aimbotRange
-	local closestPlayer = nil
 	
-	for _, otherPlayer in pairs(Players:GetPlayers()) do
-		if otherPlayer ~= player and otherPlayer.Character then
-			local character = otherPlayer.Character
-			local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-			local humanoid = character:FindFirstChild("Humanoid")
+	if aimbotEnabled then
+		toggleButton.Text = "Aimbot ON"
+		toggleButton.BackgroundColor3 = Color3.fromRGB(50,200,80)
+	else
+		toggleButton.Text = "Aimbot OFF"
+		toggleButton.BackgroundColor3 = Color3.fromRGB(180,50,50)
+	end
+end)
+
+-- CLOSE GUI
+closeButton.MouseButton1Click:Connect(function()
+	screenGui:Destroy()
+end)
+
+-- MOBILE + PC SLIDER
+local draggingSlider = false
+
+local function updateSlider(input)
+	local posX
+	
+	if input.UserInputType == Enum.UserInputType.Touch then
+		posX = input.Position.X
+	else
+		posX = UserInputService:GetMouseLocation().X
+	end
+	
+	local barX = sliderBack.AbsolutePosition.X
+	local barSize = sliderBack.AbsoluteSize.X
+	
+	local percent = math.clamp((posX - barX) / barSize, 0, 1)
+	
+	sliderFill.Size = UDim2.new(percent,0,1,0)
+	
+	aimbotRange = math.floor(percent * 300)
+	if aimbotRange < 20 then
+		aimbotRange = 20
+	end
+	
+	rangeLabel.Text = "Range: "..aimbotRange
+end
+
+sliderBack.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		
+		draggingSlider = true
+		updateSlider(input)
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if draggingSlider then
+		updateSlider(input)
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		
+		draggingSlider = false
+	end
+end)
+
+-- FIND CLOSEST PLAYER
+local function getClosestPlayer()
+	local closest = nil
+	local shortestDistance = aimbotRange
+	
+	for _, target in pairs(Players:GetPlayers()) do
+		if target ~= player and target.Character then
 			
-			if humanoidRootPart and humanoid and humanoid.Health > 0 then
-				local distance = (humanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+			local humanoid = target.Character:FindFirstChild("Humanoid")
+			local root = target.Character:FindFirstChild("HumanoidRootPart")
+			
+			if humanoid and root and humanoid.Health > 0 then
 				
-				if distance < closestDistance then
-					closestDistance = distance
-					closestPlayer = otherPlayer
+				local myRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+				
+				if myRoot then
+					local distance = (root.Position - myRoot.Position).Magnitude
+					
+					if distance < shortestDistance then
+						shortestDistance = distance
+						closest = target
+					end
 				end
 			end
 		end
 	end
 	
-	return closestPlayer
+	return closest
 end
 
--- Main Aimbot Loop
+-- AIMBOT LOOP
 RunService.RenderStepped:Connect(function()
-	if aimbotEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-		local target = findClosestEnemy()
+	if not aimbotEnabled then
+		return
+	end
+	
+	local target = getClosestPlayer()
+	
+	if target and target.Character then
+		local root = target.Character:FindFirstChild("HumanoidRootPart")
 		
-		if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-			local targetPos = target.Character.HumanoidRootPart.Position
-			local cameraPos = camera.CFrame.Position
+		if root then
+			local camPos = camera.CFrame.Position
+			local targetPos = root.Position
 			
-			-- Smooth aim towards target
-			local direction = (targetPos - cameraPos).Unit
-			local newCFrame = CFrame.new(cameraPos, cameraPos + direction)
+			local newCF = CFrame.new(camPos, targetPos)
 			
-			camera.CFrame = camera.CFrame:Lerp(newCFrame, smoothness)
-			targetPlayer = target
-		else
-			targetPlayer = nil
+			camera.CFrame = camera.CFrame:Lerp(newCF, smoothness)
 		end
 	end
-end)
-
--- Cleanup on respawn
-player.CharacterAdded:Connect(function()
-	targetPlayer = nil
 end)
