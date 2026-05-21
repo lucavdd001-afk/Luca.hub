@@ -57,7 +57,7 @@ message.Font = Enum.Font.Gotham
 message.TextScaled = true
 message.Text = [[You were removed from this experience.
 
-Reason: Unauthorized client modifications detected.
+Reason: exploiting go touch grass.
 
 Your session has been terminated by the game's anti-cheat system due to suspicious activity linked to exploit execution or tampering with protected game functions.
 
